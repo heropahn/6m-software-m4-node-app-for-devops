@@ -39,15 +39,15 @@ jobs:
     steps:
       - checkout
       - docker/check:
-          registry-url: https://index.docker.io/v1/
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          # registry-url: https://index.docker.io/v1/
+          username: DOCKER_USER
+          password: DOCKER_PASS
       - docker/publish:
           image: "heropahn/circleci_m4"
           tag: "latest"
-          registry-url: https://index.docker.io/v1/
-          docker-username: DOCKER_USER
-          docker-password: DOCKER_PASS
+          # registry-url: https://index.docker.io/v1/
+          username: DOCKER_USER
+          password: DOCKER_PASS
 
 # Workflows
 workflows:
