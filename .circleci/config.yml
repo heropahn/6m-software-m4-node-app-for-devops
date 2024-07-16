@@ -21,15 +21,6 @@ jobs:
           name: Install Dependencies
           command: npm install
       - run:
-          name: Check Docker Daemon Status
-          command: sudo systemctl status docker
-      - run:
-          name: Restart Docker Service
-          command: sudo systemctl restart docker
-      - run:
-          name: Check Docker Socket Permissions
-          command: ls -l /var/run/docker.sock
-      - run:
           name: Docker Build
           command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
 
