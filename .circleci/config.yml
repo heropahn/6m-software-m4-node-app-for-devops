@@ -2,11 +2,14 @@ version: 2.1
 
 # Orbs
 orbs:
+  # Node orb
   node: circleci/node@5.0.1
+  # Docker orb
   docker: circleci/docker@1.4.0
 
 # Jobs
 jobs:
+  # Build job
   build:
     docker:
       - image: cimg/node:16.10
@@ -21,6 +24,7 @@ jobs:
           name: Docker Build
           command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
 
+  # Test job
   test:
     docker:
       - image: cimg/node:16.10
@@ -32,17 +36,28 @@ jobs:
           name: Run Tests
           command: npm run test
 
+  # Build and Push job
   build-and-push:
-    executor: docker/docker
+    docker:
+      - image: cimg/base:stable
     steps:
       - checkout
-      - docker/login:
-          username: DOCKER_USER
-          password: DOCKER_PASS
-      - docker/publish:
-          image: $DOCKER_USER/circleci_m4
-          tag: $CIRCLE_SHA1
+      - run:
+          name: Check Docker Version
+          command: docker version
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t $DOCKER_USER/circleci_m4:latest .
+            docker tag $DOCKER_USER/circleci_m4:latest $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
+      - run:
+          name: Docker Login and Push
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
+            docker push $DOCKER_USER/circleci_m4:latest
 
+  # Check Docker job
   check-docker:
     docker:
       - image: circleci/python:3.8
