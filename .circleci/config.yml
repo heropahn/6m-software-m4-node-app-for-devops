@@ -2,14 +2,11 @@ version: 2.1
 
 # Orbs
 orbs:
-  # Node orb
   node: circleci/node@5.0.1
-  # Docker orb
   docker: circleci/docker@1.4.0
 
 # Jobs
 jobs:
-  # Build job
   build:
     docker:
       - image: cimg/node:16.10
@@ -20,8 +17,10 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
+      - run:
+          name: Docker Build
+          command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
 
-  # Test job
   test:
     docker:
       - image: cimg/node:16.10
@@ -33,21 +32,27 @@ jobs:
           name: Run Tests
           command: npm run test
 
-  # Build and Push job
   build-and-push:
     executor: docker/docker
     steps:
       - checkout
       - docker/login:
-          # registry-url: https://index.docker.io/v1/
           username: DOCKER_USER
           password: DOCKER_PASS
       - docker/publish:
-          image: "heropahn/circleci_m4"
-          tag: "latest"
-          # registry-url: https://index.docker.io/v1/
-          # username: DOCKER_USER
-          # password: DOCKER_PASS
+          image: $DOCKER_USER/circleci_m4
+          tag: $CIRCLE_SHA1
+
+  check-docker:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: Check Docker Status
+          command: |
+            docker version
+            docker run hello-world
 
 # Workflows
 workflows:
@@ -61,3 +66,6 @@ workflows:
       - build-and-push:
           requires:
             - test
+      - check-docker:
+          requires:
+            - build-and-push
