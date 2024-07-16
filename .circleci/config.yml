@@ -2,17 +2,15 @@ version: 2.1
 
 # Orbs
 orbs:
-  # Node orb
   node: circleci/node@5.0.1
-  # Docker orb
   docker: circleci/docker@1.4.0
 
 # Jobs
 jobs:
-  # Build job
-  build:
+  build-and-push:
     docker:
-      - image: cimg/node:16.10
+      - image: cimg/go:1.17
+    resource_class: xlarge
     steps:
       - checkout
       - node/install-packages:
@@ -20,11 +18,16 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
-          name: Docker Build
-          command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
+          name: Docker Build and Push
+          command: |
+            TAG=0.1.$CIRCLE_BUILD_NUM
+            docker build -t $DOCKER_USER/circleci-demo-docker:$TAG .
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker push $DOCKER_USER/circleci-demo-docker:$TAG
 
-  # Test job
   test:
     docker:
       - image: cimg/node:16.10
@@ -36,26 +39,6 @@ jobs:
           name: Run Tests
           command: npm run test
 
-  # Build and Push job
-  build-and-push:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - run:
-          name: Check Docker Version
-          command: docker version
-      # ... steps for building/testing app ...
-      - setup_remote_docker:
-          docker_layer_caching: true
-      # build and push Docker image
-      - run: |
-          TAG=0.1.$CIRCLE_BUILD_NUM
-          docker build -t CircleCI-Public/circleci_m4:$TAG .
-          echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-          docker push CircleCI-Public/circleci_m4:$TAG
-
-  # Check Docker job
   check-docker:
     docker:
       - image: circleci/python:3.8
@@ -72,13 +55,10 @@ workflows:
   version: 2
   simple_workflow:
     jobs:
-      - build
+      - build-and-push
       - test:
           requires:
-            - build
-      - build-and-push:
-          requires:
-            - test
+            - build-and-push
       - check-docker:
           requires:
             - build-and-push
