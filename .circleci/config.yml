@@ -1,7 +1,48 @@
 # circleci version
 version: 2.1
 
+# YAML takes indentation very seriously.
+
 # Jobs
 orbs:
   # Node orb
   node: circleci/node@5.0.1
+
+# Workflows - Build and test jobs
+build:
+  docker:
+    - image: cimg/node:16.10
+  steps:
+    - checkout
+    - node/install-packages:
+        pkg-manager: npm
+    - run: | # | means multiline
+        echo "Installing dependencies..."
+        npm install
+
+test:
+  docker:
+    - image: cimg/node:16.10 # can use difference image for different jobs
+  steps:
+    - checkout
+    - node/install-packages:
+        pkg-manager: npm
+    - run: | # means multiline
+        echo "Running tests..."
+        npm run test
+
+# Workflow
+workflows:
+  simple_workflow:
+    jobs:
+      - build # Array of jobs
+      - test:
+          requires: # requires build job to be completed, has to be successful/run
+            - build
+# # Publish docker image to docker hub repo
+# docker login -u $DOCKER_USER -p $DOCKER_PASS
+# docker build -t $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1 .
+# docker push $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1
+# docker tag $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1 $DOCKER_USER/$DOCKER_REPO:latest
+# docker push $DOCKER_USER/$DOCKER_REPO:latest
+
