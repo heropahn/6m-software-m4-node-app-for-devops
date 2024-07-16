@@ -67,18 +67,6 @@ jobs:
             docker push $DOCKER_USER/circleci_m4:latest
             docker push $DOCKER_USER/circleci_m4:latest
 
-  # Check Docker job
-  check-docker:
-    docker:
-      - image: circleci/python:3.8
-    steps:
-      - checkout
-      - run:
-          name: Check Docker Status
-          command: |
-            docker version
-            docker run hello-world
-
 # Workflows
 workflows:
   version: 2
@@ -91,6 +79,3 @@ workflows:
       - build-and-push:
           requires:
             - test
-      - check-docker:
-          requires:
-            - build-and-push
