@@ -63,7 +63,7 @@ jobs:
           name: Docker Login and Push
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
+            # docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
             docker push $DOCKER_USER/circleci_m4:latest
 
   # Check Docker job
