@@ -20,18 +20,18 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
-      - run:
-          name: Check Docker Daemon Status
-          command: sudo systemctl status docker
-      - run:
-          name: Restart Docker Service
-          command: sudo systemctl restart docker
-      - run:
-          name: Check Docker Socket Permissions
-          command: ls -l /var/run/docker.sock
-      - run:
-          name: Docker Build
-          command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
+      # - run:
+      #     name: Check Docker Daemon Status
+      #     command: sudo systemctl status docker
+      # - run:
+      #     name: Restart Docker Service
+      #     command: sudo systemctl restart docker
+      # - run:
+      #     name: Check Docker Socket Permissions
+      #     command: ls -l /var/run/docker.sock
+      # - run:
+      #     name: Docker Build
+      #     command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
 
   # Test job
   test:
@@ -52,22 +52,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Docker Login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+          name: Check Docker Version
+          command: docker version
       - run:
-          name: Build and Tag Docker Image
+          name: Build Docker Image
           command: |
             docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
             docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
-            build_status=$?  # Capture build command exit status
-            echo "Docker build exit status: $build_status"
-            docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
-            tag_status=$?  # Capture tag command exit status
-            echo "Docker tag exit status: $tag_status"
-            exit $(($build_status + $tag_status))  # Exit with combined status of build and tag
       - run:
-          name: Push Docker Image
+          name: Docker Login and Push
           command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
             docker push $DOCKER_USER/circleci_m4:latest
 
