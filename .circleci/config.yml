@@ -42,20 +42,12 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - run:
-          name: Check Docker Version
-          command: docker version
-      - run:
-          name: Build Docker Image
-          command: |
-            docker build -t $DOCKER_USER/circleci_m4:latest .
-            docker tag $DOCKER_USER/circleci_m4:latest $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
-      - run:
-          name: Docker Login and Push
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
-            docker push $DOCKER_USER/circleci_m4:latest
+      - docker/login:
+          username: DOCKER_USER
+          password: DOCKER_PASS
+      - docker/publish:
+          image: $DOCKER_USER/circleci_m4
+          tag: $CIRCLE_SHA1
 
   # Check Docker job
   check-docker:
