@@ -20,18 +20,18 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
-      # - run:
-      #     name: Check Docker Daemon Status
-      #     command: sudo systemctl status docker
-      # - run:
-      #     name: Restart Docker Service
-      #     command: sudo systemctl restart docker
-      # - run:
-      #     name: Check Docker Socket Permissions
-      #     command: ls -l /var/run/docker.sock
-      # - run:
-      #     name: Docker Build
-      #     command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
+      - run:
+          name: Check Docker Daemon Status
+          command: sudo systemctl status docker
+      - run:
+          name: Restart Docker Service
+          command: sudo systemctl restart docker
+      - run:
+          name: Check Docker Socket Permissions
+          command: ls -l /var/run/docker.sock
+      - run:
+          name: Docker Build
+          command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
 
   # Test job
   test:
@@ -47,17 +47,24 @@ jobs:
 
   # Build and Push job
   build-and-push:
-    executor: docker/default
+    docker:
+      - image: cimg/base:stable
     steps:
       - checkout
-      - docker/build:
-          image: cimg/base:stable
-          tag: $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Specify the tag for the Docker image
-      - docker/push:
-          image: $DOCKER_USER/circleci_m4
-          tag: $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Tag to push to Docker Hub
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+      - run:
+          name: Check Docker Version
+          command: docker version
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t $DOCKER_USER/circleci_m4:latest .
+            docker tag $DOCKER_USER/circleci_m4:latest $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
+      - run:
+          name: Docker Login and Push
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
+            docker push $DOCKER_USER/circleci_m4:latest
 
   # Check Docker job
   check-docker:
