@@ -1,7 +1,5 @@
 version: 2.1
 
-# YAML takes indentation very seriously.
-
 # Orbs
 orbs:
   # Node orb
@@ -19,42 +17,41 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
-      - run: | # | means multiline
-          echo "Installing dependencies..."
-          npm install
+      - run:
+          name: Install Dependencies
+          command: npm install
 
   # Test job
   test:
     docker:
-      - image: cimg/node:16.10 # can use a different image for different jobs
+      - image: cimg/node:16.10
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: npm
-      - run: | # | means multiline
-          echo "Running tests..."
-          npm run test
+      - run:
+          name: Run Tests
+          command: npm run test
 
   # Build and Push job
   build-and-push:
     docker:
       - image: cimg/base:stable
     steps:
-      - setup_remote_docker:
-          version: 20.10.7
       - checkout
-      - docker/login:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+      - run:
+          name: Docker Login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       - run:
           name: Build Docker Image
           command: |
             docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
             docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
-      - docker/push:
-          image: $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
-      - docker/push:
-          image: $DOCKER_USER/circleci_m4:latest
+      - run:
+          name: Push Docker Image
+          command: |
+            docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
+            docker push $DOCKER_USER/circleci_m4:latest
 
   # Check Docker job
   check-docker:
@@ -73,9 +70,9 @@ workflows:
   version: 2
   simple_workflow:
     jobs:
-      - build # Array of jobs
+      - build
       - test:
-          requires: # Requires build job to be completed successfully
+          requires:
             - build
       - build-and-push:
           requires:
