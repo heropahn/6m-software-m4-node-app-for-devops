@@ -47,24 +47,21 @@ jobs:
 
   # Build and Push job
   build-and-push:
-    docker:
-      - image: cimg/base:stable
+    executor: docker/default # Use Docker as the execution environment
     steps:
-      - checkout
-      - run:
-          name: Check Docker Version
-          command: docker version
-      - run:
-          name: Build Docker Image
-          command: |
-            docker build -t $DOCKER_USER/circleci_m4:latest .
-            docker tag $DOCKER_USER/circleci_m4:latest $DOCKER_USER/circleci_m4:latest
-      - run:
-          name: Docker Login and Push
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            # docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
-            docker push $DOCKER_USER/circleci_m4:latest
+      - checkout # Checkout your source code
+      - docker/build:
+          image: cimg/base:stable # Docker image to build
+          tags:
+            - $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Tag with specific version
+            - $DOCKER_USER/circleci_m4:latest # Tag as latest
+      - docker/push:
+          image: $DOCKER_USER/circleci_m4 # Docker image to push
+          tags:
+            - $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Specify the versioned tag
+            - $DOCKER_USER/circleci_m4:latest # Tag as latest
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
 
   # Check Docker job
   check-docker:
