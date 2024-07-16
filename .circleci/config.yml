@@ -33,6 +33,23 @@ jobs:
           echo "Running tests..."
           npm run test
 
+  # Publish job
+  publish:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - setup_remote_docker:
+          version: 20.10.7
+      - checkout
+      - run:
+          name: Publish Docker Image
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker build -t $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1 .
+            docker push $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1
+            docker tag $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1 $DOCKER_USER/$DOCKER_REPO:latest
+            docker push $DOCKER_USER/$DOCKER_REPO:latest
+
 # Workflows
 workflows:
   version: 2
@@ -42,10 +59,3 @@ workflows:
       - test:
           requires: # Requires build job to be completed successfully
             - build
-
-  # # Publish docker image to docker hub repo
-  # docker login -u $DOCKER_USER -p $DOCKER_PASS
-  # docker build -t $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1 .
-  # docker push $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1
-  # docker tag $DOCKER_USER/$DOCKER_REPO:$CIRCLE_SHA1 $DOCKER_USER/$DOCKER_REPO:latest
-  # docker push $DOCKER_USER/$DOCKER_REPO:latest
