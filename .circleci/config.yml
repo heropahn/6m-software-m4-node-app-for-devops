@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Build and Tag Docker Image
           command: |
-            docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 . --verbose
+            docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
             docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
             build_status=$?  # Capture build command exit status
             echo "Docker build exit status: $build_status"
