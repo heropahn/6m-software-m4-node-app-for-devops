@@ -65,7 +65,6 @@ jobs:
           name: Push Docker Image
           command: |
             docker push $DOCKER_USER/circleci_m4:latest
-            docker push $DOCKER_USER/circleci_m4:latest
 
 # Workflows
 workflows:
