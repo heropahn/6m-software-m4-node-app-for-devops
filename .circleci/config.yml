@@ -20,9 +20,6 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
-      - run:
-          name: Docker Build
-          command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
 
   # Test job
   test:
@@ -52,18 +49,6 @@ jobs:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
 
-  # Check Docker job
-  check-docker:
-    docker:
-      - image: circleci/python:3.8
-    steps:
-      - checkout
-      - run:
-          name: Check Docker Status
-          command: |
-            docker version
-            docker run hello-world
-
 # Workflows
 workflows:
   version: 2
@@ -76,6 +61,3 @@ workflows:
       - build-and-push:
           requires:
             - test
-      - check-docker:
-          requires:
-            - build-and-push
