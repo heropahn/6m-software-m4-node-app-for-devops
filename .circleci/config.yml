@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
+            docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 . --verbose
             docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
       - run:
           name: Push Docker Image
