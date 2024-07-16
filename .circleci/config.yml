@@ -51,16 +51,20 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - docker/build:
-          image: cimg/base:stable
-          tags:
-            - $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
-            - $DOCKER_USER/circleci_m4:latest
-      - docker/push:
-          image: $DOCKER_USER/circleci_m4
-          tags:
-            - $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
-            - $DOCKER_USER/circleci_m4:latest
+      - run:
+          name: Check Docker Version
+          command: docker version
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
+            docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
+      - run:
+          name: Docker Login and Push
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            # docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
+            docker push $DOCKER_USER/circleci_m4:latest
 
   # Check Docker job
   check-docker:
