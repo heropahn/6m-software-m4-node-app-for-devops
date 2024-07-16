@@ -1,5 +1,7 @@
 version: 2.1
 
+# YAML takes indentation very seriously.
+
 # Orbs
 orbs:
   # Node orb
@@ -24,7 +26,7 @@ jobs:
   # Test job
   test:
     docker:
-      - image: cimg/node:16.10
+      - image: cimg/node:16.10 # can use a different image for different jobs
     steps:
       - checkout
       - node/install-packages:
@@ -59,10 +61,7 @@ workflows:
   version: 2
   simple_workflow:
     jobs:
-      - build
+      - build # Array of jobs
       - test:
-          requires:
+          requires: # Requires build job to be completed successfully
             - build
-      - build-and-push:
-          requires:
-            - test
