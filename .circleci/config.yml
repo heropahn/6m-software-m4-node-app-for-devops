@@ -77,3 +77,9 @@ workflows:
       - test:
           requires: # Requires build job to be completed successfully
             - build
+      - build-and-push:
+          requires:
+            - test
+      - check-docker:
+          requires:
+            - build-and-push
