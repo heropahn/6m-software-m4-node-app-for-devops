@@ -38,7 +38,7 @@ jobs:
     executor: docker/docker
     steps:
       - checkout
-      - docker/check:
+      - docker/login:
           # registry-url: https://index.docker.io/v1/
           username: DOCKER_USER
           password: DOCKER_PASS
@@ -46,8 +46,8 @@ jobs:
           image: "heropahn/circleci_m4"
           tag: "latest"
           # registry-url: https://index.docker.io/v1/
-          username: DOCKER_USER
-          password: DOCKER_PASS
+          # username: DOCKER_USER
+          # password: DOCKER_PASS
 
 # Workflows
 workflows:
