@@ -20,23 +20,11 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
-      # - run:
-      #     name: Check Docker Daemon Status
-      #     command: sudo systemctl status docker
-      # - run:
-      #     name: Restart Docker Service
-      #     command: sudo systemctl restart docker
-      # - run:
-      #     name: Check Docker Socket Permissions
-      #     command: ls -l /var/run/docker.sock
-      # - run:
-      #     name: Docker Build
-      #     command: docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
 
   # Test job
   test:
     docker:
-      - image: cimg/node:16.10
+      - image: cimg/node:16.10 # Use a Node image to run tests
     steps:
       - checkout
       - node/install-packages:
@@ -48,23 +36,22 @@ jobs:
   # Build and Push job
   build-and-push:
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.7 # Use a Python image to run Docker commands
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.7
           docker_layer_caching: true
-      - docker/build:
-          image: "heropahn/circleci_m4"
-          tag: "latest"
-          path: "."
+      - docker/build: # Build the Docker image
+          image: "heropahn/circleci_m4" # Name of the Docker image
+          tag: "latest" # Tag of the Docker image
+          path: "." # Path to the Dockerfile
       - run:
           name: Docker Login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
       - run:
           name: Push Docker Image
-          command: |
-            docker push $DOCKER_USER/circleci_m4:latest
+          command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
 
 # Workflows
 workflows:
