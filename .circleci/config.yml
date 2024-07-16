@@ -1,0 +1,7 @@
+# circleci version
+version: 2.1
+
+# Jobs
+orbs:
+  # Node orb
+  node: circleci/node@5.0.1
