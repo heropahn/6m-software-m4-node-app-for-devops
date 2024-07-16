@@ -48,23 +48,16 @@ jobs:
   # Build and Push job
   build-and-push:
     docker:
-      - image: cimg/base:stable
+      - image: circleci/python:3.7
     steps:
       - checkout
-      - run:
-          name: Docker Login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-      - run:
-          name: Build and Tag Docker Image
-          command: |
-            docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 . -v
-            docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
-            build_status=$?  # Capture build command exit status
-            echo "Docker build exit status: $build_status"
-            docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
-            tag_status=$?  # Capture tag command exit status
-            echo "Docker tag exit status: $tag_status"
-            exit $(($build_status + $tag_status))  # Exit with combined status of build and tag
+      - setup_remote_docker:
+          version: 20.10.7
+          docker_layer_caching: true
+      - docker/build:
+          image: "circleci_m4"
+          tag: "latest"
+          path: "."
       - run:
           name: Push Docker Image
           command: |
