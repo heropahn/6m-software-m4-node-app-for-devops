@@ -59,8 +59,12 @@ jobs:
           tag: "latest"
           path: "."
       - run:
+          name: Docker Login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
           name: Push Docker Image
           command: |
+            docker push $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
             docker push $DOCKER_USER/circleci_m4:latest
 
   # Check Docker job
