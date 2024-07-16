@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            docker build -t $DOCKER_USER/education-space:$CIRCLE_SHA1 .
+            docker build -t $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 .
             docker tag $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 $DOCKER_USER/circleci_m4:latest
       - docker/push:
           image: $DOCKER_USER/circleci_m4:$CIRCLE_SHA1
