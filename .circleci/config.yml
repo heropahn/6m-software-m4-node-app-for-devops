@@ -42,12 +42,18 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - docker/login:
-          username: DOCKER_USER
-          password: DOCKER_PASS
-      - docker/publish:
-          image: $DOCKER_USER/circleci_m4
-          tag: $CIRCLE_SHA1
+      - run:
+          name: Check Docker Version
+          command: docker version
+      # ... steps for building/testing app ...
+      - setup_remote_docker:
+          docker_layer_caching: true
+      # build and push Docker image
+      - run: |
+          TAG=0.1.$CIRCLE_BUILD_NUM
+          docker build -t CircleCI-Public/circleci_m4:$TAG .
+          echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+          docker push CircleCI-Public/circleci_m4:$TAG
 
   # Check Docker job
   check-docker:
