@@ -47,19 +47,15 @@ jobs:
 
   # Build and Push job
   build-and-push:
-    executor: docker/default # Use Docker as the execution environment
+    executor: docker/default
     steps:
-      - checkout # Checkout your source code
+      - checkout
       - docker/build:
-          image: cimg/base:stable # Docker image to build
-          tags:
-            - $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Tag with specific version
-            - $DOCKER_USER/circleci_m4:latest # Tag as latest
+          image: cimg/base:stable
+          tag: $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Specify the tag for the Docker image
       - docker/push:
-          image: $DOCKER_USER/circleci_m4 # Docker image to push
-          tags:
-            - $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Specify the versioned tag
-            - $DOCKER_USER/circleci_m4:latest # Tag as latest
+          image: $DOCKER_USER/circleci_m4
+          tag: $DOCKER_USER/circleci_m4:$CIRCLE_SHA1 # Tag to push to Docker Hub
           username: $DOCKER_USER
           password: $DOCKER_PASS
 
