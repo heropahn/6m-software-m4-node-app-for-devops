@@ -74,13 +74,14 @@ jobs:
     docker:
       - image: cimg/node:16.10
     steps:
-      - setup_remote_docker
-      - heroku/install
-      - checkout
+      - setup_remote_docker # Set up Docker
+      - heroku/install # Install the Heroku CLI
+      - checkout # Check out the code
       - run:
           name: Heroku Container Push
           command: |
             heroku container:login
+            heroku stack:set container -a george-su-devops
             heroku container:push web -a george-su-devops
             heroku container:release web -a george-su-devops
 
