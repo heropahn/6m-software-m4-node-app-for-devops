@@ -6,6 +6,8 @@ orbs:
   node: circleci/node@5.0.1
   # Docker orb
   docker: circleci/docker@1.4.0
+  # Heroku orb
+  heroku: circleci/heroku@2.0.0
 
 # Jobs
 jobs:
@@ -53,6 +55,31 @@ jobs:
           name: Push Docker Image
           command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
 
+  # Publish job - lesson 4.6
+  publish:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
+          image: heropahn/education-space
+      - docker/push:
+          image: heropahn/education-space
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:login
+            heroku container:push web -a george-su-devops
+            heroku container:release web -a george-su-devops
+
 # Workflows
 workflows:
   version: 2
@@ -65,3 +92,10 @@ workflows:
       - build-and-push: # Build and push the Docker image
           requires:
             - test
+      # Publish and deploy jobs - Assignment 4.6
+      - publish:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - publish
