@@ -5,7 +5,7 @@ orbs:
   # Node orb
   node: circleci/node@5.0.1
   # Docker orb
-  docker: circleci/docker@1.4.0
+  docker: circleci/docker2.1.4
   # Heroku orb
   heroku: circleci/heroku@2.0.0
 
