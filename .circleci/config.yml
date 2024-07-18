@@ -61,12 +61,13 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - docker/check
-      - docker/build:
-          image: heropahn/education-space
+      #- docker/check
       - run:
           name: Docker Login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
+      - docker/build:
+          image: heropahn/education-space
+
       - docker/push:
           image: heropahn/education-space
   deploy:
