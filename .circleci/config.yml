@@ -55,35 +55,39 @@ jobs:
           name: Push Docker Image
           command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
 
-  # Publish job - lesson 4.6
-  publish:
-    executor: docker/docker
-    steps:
-      - setup_remote_docker
-      - checkout
-      #- docker/check
-      - run:
-          name: Docker Login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
-      - docker/build:
-          image: heropahn/education-space
+  # # Publish job - lesson 4.6
+  # publish:
+  #   executor: docker/docker
+  #   steps:
+  #     - setup_remote_docker
+  #     - checkout
+  #     #- docker/check
+  #     - run:
+  #         name: Docker Login
+  #         command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
+  #     - docker/build:
+  #         image: heropahn/education-space
 
-      - docker/push:
-          image: heropahn/education-space
-  deploy:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - setup_remote_docker # Set up Docker
-      - heroku/install # Install the Heroku CLI
-      - checkout # Check out the code
-      - run:
-          name: Heroku Container Push
-          command: |
-            heroku container:login
-            heroku stack:set container -a george-su-devops
-            heroku container:push web -a george-su-devops
-            heroku container:release web -a george-su-devops
+  #     - docker/push:
+  #         image: heropahn/education-space
+  # deploy:
+  #   docker:
+  #     - image: cimg/node:16.10
+  #   steps:
+  #     - setup_remote_docker # Set up Docker
+  #     - heroku/install # Install the Heroku CLI
+  #     - checkout # Check out the code
+  #     - run:
+  #         name: Heroku Container Push
+  #         #  Set the stack to container, push the Docker image to Heroku, and release the image
+  #         # push web means the process type build the image then push to registry
+  #         # -a means the app name
+  #         # the following are heroku commands
+  #         command: |
+  #           heroku container:login
+  #           heroku stack:set container -a george-su-devops 
+  #           heroku container:push web -a george-su-devops
+  #           heroku container:release web -a george-su-devops
 
 # Workflows
 workflows:
@@ -98,9 +102,9 @@ workflows:
           requires:
             - test
       # Publish and deploy jobs - Assignment 4.6
-      - publish:
-          requires:
-            - test
-      - deploy:
-          requires:
-            - publish
+      # - publish:
+      #     requires:
+      #       - test
+      # - deploy:
+      #     requires:
+      #       - publish
