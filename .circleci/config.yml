@@ -92,7 +92,7 @@ jobs:
 # Workflows
 workflows:
   version: 2
-  simple_workflow_coaching: # Define the workflow
+  simple_workflow_coach: # Define the workflow
     jobs: # Define the jobs that will run in the workflow
       - build
       - test: # Run tests
