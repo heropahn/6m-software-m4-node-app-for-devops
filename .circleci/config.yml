@@ -128,7 +128,7 @@ jobs:
 
 workflows:
   version: 2
-  workflow_main: # Define the workflow
+  simple_workflow_coach: # Define the workflow
     jobs: # Define the jobs that will run in the workflow
       - build:
           filters:
@@ -140,9 +140,16 @@ workflows:
           filters:
             branches:
               only: main
-
-  workflow_release: # Define the workflow
-    jobs: # Define the jobs that will run in the workflow
+      - run:
+          name: Create commit on release
+          command: |
+            git checkout release
+            git merge main
+            git commit --allow-empty -m "Trigger release workflow"
+            git push origin release
+          filters:
+            branches:
+              only: main
       - build-and-push: # Build and push the Docker image
           requires:
             - test
