@@ -128,7 +128,7 @@ jobs:
 
 workflows:
   version: 2
-  simple_workflow_coach: # Define the workflow
+  workflow_main: # Define the workflow
     jobs: # Define the jobs that will run in the workflow
       - build:
           filters:
@@ -140,6 +140,9 @@ workflows:
           filters:
             branches:
               only: main
+
+  workflow_release: # Define the workflow
+    jobs: # Define the jobs that will run in the workflow
       - build-and-push: # Build and push the Docker image
           requires:
             - test
