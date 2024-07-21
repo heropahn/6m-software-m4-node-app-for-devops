@@ -1,0 +1,23 @@
+# .github/workflows/automerge.yml
+name: Auto merge main into release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Merge main into release
+        run: |
+          git config --global user.email "heropahn@icloud.com"
+          git config --global user.name "heropahn"
+          git checkout release
+          git merge --no-edit main
+          git push origin release
