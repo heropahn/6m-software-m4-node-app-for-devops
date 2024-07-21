@@ -141,29 +141,24 @@ jobs:
   #         requires:
   #           - publish
 
+# Workflows
 workflows:
   version: 2
-  simple_workflow_coach: # Define the workflow
-    jobs: # Define the jobs that will run in the workflow
+  main_workflow: # Workflow for the main branch
+    jobs:
       - build:
           filters:
             branches:
               only: main
-      - test: # Run tests
+      - test:
           requires:
             - build
           filters:
             branches:
               only: main
-      - create-commit-on-release:
-          requires:
-            - test
-          filters:
-            branches:
-              only: main
-      - build-and-push: # Build and push the Docker image
-          requires:
-            - test
+  release_workflow: # Workflow for the release branch
+    jobs:
+      - build-and-push:
           filters:
             branches:
               only: release
