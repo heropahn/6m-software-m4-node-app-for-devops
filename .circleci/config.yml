@@ -46,7 +46,11 @@ jobs:
           docker_layer_caching: true
       - docker/build: # Build the Docker image
           image: "heropahn/circleci_m4" # Name of the Docker image
-          tag: "latest,${CIRCLE_TAG}" # Tag of the Docker image
+          tag: "latest" # Tag of the Docker image
+          path: "." # Path to the Dockerfile
+      - docker/build: # Build the Docker image with tag
+          image: "heropahn/circleci_m4" # Name of the Docker image
+          tag: "${CIRCLE_TAG}" # Tag of the Docker image
           path: "." # Path to the Dockerfile
       - run:
           name: Docker Login
@@ -72,11 +76,16 @@ jobs:
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
       - docker/build:
           image: heropahn/education-space
-          tag: "latest,${CIRCLE_TAG}"
-
+          tag: "latest"
+      - docker/build:
+          image: heropahn/education-space
+          tag: "${CIRCLE_TAG}"
       - docker/push:
           image: heropahn/education-space
-          tag: "latest,${CIRCLE_TAG}"
+          tag: "latest"
+      - docker/push:
+          image: heropahn/education-space
+          tag: "${CIRCLE_TAG}"
 
   deploy:
     docker:
