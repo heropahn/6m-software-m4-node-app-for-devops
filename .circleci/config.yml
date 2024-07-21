@@ -1,4 +1,4 @@
-version: 2.1
+version: 2.1 # Use version 2.1 of the configuration file
 
 # Orbs
 orbs:
@@ -46,65 +46,108 @@ jobs:
           docker_layer_caching: true
       - docker/build: # Build the Docker image
           image: "heropahn/circleci_m4" # Name of the Docker image
-          tag: "latest" # Tag of the Docker image
+          tag: "latest,${CIRCLE_TAG}" # Tag of the Docker image
           path: "." # Path to the Dockerfile
       - run:
           name: Docker Login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
       - run:
           name: Push Docker Image
-          command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
+          # command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
+          command: | #
+            docker push $DOCKER_USER/circleci_m4:latest
+              if [ ! -z "$CIRCLE_TAG" ]; then
+                docker push $DOCKER_USER/circleci_m4:$CIRCLE_TAG
+              fi
 
-  # # Publish job - lesson 4.6
-  # publish:
-  #   executor: docker/docker
-  #   steps:
-  #     - setup_remote_docker
-  #     - checkout
-  #     #- docker/check
-  #     - run:
-  #         name: Docker Login
-  #         command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
-  #     - docker/build:
-  #         image: heropahn/education-space
+  # Publish job - lesson 4.6
+  publish:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      #- docker/check
+      - run:
+          name: Docker Login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
+      - docker/build:
+          image: heropahn/education-space
+          tag: "latest,${CIRCLE_TAG}"
 
-  #     - docker/push:
-  #         image: heropahn/education-space
-  # deploy:
-  #   docker:
-  #     - image: cimg/node:16.10
-  #   steps:
-  #     - setup_remote_docker # Set up Docker
-  #     - heroku/install # Install the Heroku CLI
-  #     - checkout # Check out the code
-  #     - run:
-  #         name: Heroku Container Push
-  #         #  Set the stack to container, push the Docker image to Heroku, and release the image
-  #         # push web means the process type build the image then push to registry
-  #         # -a means the app name
-  #         # the following are heroku commands
-  #         command: |
-  #           heroku container:login
-  #           heroku stack:set container -a george-su-devops 
-  #           heroku container:push web -a george-su-devops
-  #           heroku container:release web -a george-su-devops
+      - docker/push:
+          image: heropahn/education-space
+          tag: "latest,${CIRCLE_TAG}"
+
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker # Set up Docker
+      - heroku/install # Install the Heroku CLI
+      - checkout # Check out the code
+      - run:
+          name: Heroku Container Push
+          #  Set the stack to container, push the Docker image to Heroku, and release the image
+          # push web means the process type build the image then push to registry
+          # -a means the app name
+          # the following are heroku commands
+          command: |
+            heroku container:login
+            heroku stack:set container -a george-su-devops 
+            heroku container:push web -a george-su-devops
+            heroku container:release web -a george-su-devops
 
 # Workflows
+# workflows:
+  # version: 2
+  # simple_workflow_coach: # Define the workflow
+  #   jobs: # Define the jobs that will run in the workflow
+  #     - build
+  #     - test: # Run tests
+  #         requires:
+  #           - build
+  #     - build-and-push: # Build and push the Docker image
+  #         requires:
+  #           - test
+  #     # Publish and deploy jobs - Assignment 4.6
+  #     - publish:
+  #         requires:
+  #           - test
+  #     - deploy:
+  #         requires:
+  #           - publish
+
 workflows:
   version: 2
-  simple_workflow_coaching: # Define the workflow
+  simple_workflow_coach: # Define the workflow
     jobs: # Define the jobs that will run in the workflow
-      - build
+      - build:
+          filters:
+            branches:
+              only: main
       - test: # Run tests
           requires:
             - build
+          filters:
+            branches:
+              only: main
       - build-and-push: # Build and push the Docker image
           requires:
             - test
-      # Publish and deploy jobs - Assignment 4.6
-      # - publish:
-      #     requires:
-      #       - test
-      # - deploy:
-      #     requires:
-      #       - publish
+          filters:
+            branches:
+              only: release
+            tags:
+              only: /^v.*/
+      - publish:
+          requires:
+            - test
+          filters:
+            branches:
+              only: release
+      - deploy:
+          requires:
+            - publish
+          filters:
+            branches:
+              only: release
