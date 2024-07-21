@@ -87,6 +87,21 @@ jobs:
           image: heropahn/education-space
           tag: "${CIRCLE_TAG}"
 
+  create-commit-on-release:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: Create commit on release
+          command: |
+            git config user.email "your-email@example.com"
+            git config user.name "Your Name"
+            git checkout release
+            git merge main
+            git commit --allow-empty -m "Trigger release workflow"
+            git push origin release
+
   deploy:
     docker:
       - image: cimg/node:16.10
