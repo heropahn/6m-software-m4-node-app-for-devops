@@ -95,10 +95,8 @@ jobs:
       - run:
           name: Create commit on release
           command: |
-            git config user.email "your-email@example.com"
-            git config user.name "Your Name"
             git checkout release
-            git merge main
+            git merge --no-edit main
             git commit --allow-empty -m "Trigger release workflow"
             git push origin release
 
