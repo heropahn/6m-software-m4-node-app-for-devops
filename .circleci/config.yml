@@ -70,15 +70,9 @@ jobs:
       - docker/build:
           image: heropahn/circleci_m4
           tag: "latest"
-      - docker/build:
-          image: heropahn/circleci_m4
-          tag: "${CIRCLE_TAG}"
       - docker/push:
           image: heropahn/circleci_m4
           tag: "latest"
-      - docker/push:
-          image: heropahn/circleci_m4
-          tag: "${CIRCLE_TAG}"
 
   create-commit-on-release:
     docker:
