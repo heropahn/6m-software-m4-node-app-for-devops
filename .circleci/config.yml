@@ -61,8 +61,8 @@ jobs:
   publish:
     executor: docker/docker
     steps:
-      - setup_remote_docker
-      - checkout
+      - setup_remote_docker # Set up Docker
+      - checkout # Check out the code
       #- docker/check
       - run:
           name: Docker Login
@@ -73,21 +73,6 @@ jobs:
       - docker/push:
           image: heropahn/circleci_m4
           tag: "latest"
-
-  create-commit-on-release:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - checkout
-      - run:
-          name: Create commit on release
-          command: |
-            git config user.email "heropahn@icloud.com"
-            git config user.name "heropahn"
-            git checkout release
-            git merge --no-edit main
-            git commit --allow-empty -m "Trigger release workflow"
-            git push origin release
 
   deploy:
     docker:
@@ -136,30 +121,30 @@ workflows:
       - build:
           filters:
             branches:
-              only: main
+              only: main # Only run on the main branch
       - test:
           requires:
-            - build
+            - build # Run tests
           filters:
             branches:
-              only: main
+              only: main # Only run on the main branch
   release_workflow: # Workflow for the release branch
     jobs:
       - build-and-push:
           filters:
             branches:
-              only: release
+              only: release # Only run on the release branch
             tags:
-              only: /^v.*/
+              only: /^v.*/ # Only run on tags that start with "v"
       - publish:
           requires:
-            - build-and-push
+            - build-and-push # Publish the Docker image
           filters:
             branches:
-              only: release
+              only: release # Only run on the release branch
       - deploy:
           requires:
-            - publish
+            - publish # Deploy the Docker image to Heroku
           filters:
             branches:
-              only: release
+              only: release # Only run on the release branch

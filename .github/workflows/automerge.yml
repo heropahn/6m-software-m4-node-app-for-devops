@@ -1,18 +1,20 @@
+# Github actions workflow to automatically merge the main branch into the release branch
+# To store the workflow file in
 # .github/workflows/automerge.yml
 name: Auto merge main into release
 on:
   push:
     branches:
-      - main
+      - main # Run the workflow on the main branch
 
 jobs:
   merge:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v2 # Checkout the code in the main branch
+        with: # Set the input parameter
+          fetch-depth: 0 # Fetch all history so that we can merge
 
       - name: Merge main into release
         run: |
