@@ -48,10 +48,6 @@ jobs:
           image: "heropahn/circleci_m4" # Name of the Docker image
           tag: "latest" # Tag of the Docker image
           path: "." # Path to the Dockerfile
-      - docker/build: # Build the Docker image with tag
-          image: "heropahn/circleci_m4" # Name of the Docker image
-          tag: "${CIRCLE_TAG}" # Tag of the Docker image
-          path: "." # Path to the Dockerfile
       - run:
           name: Docker Login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
@@ -60,9 +56,6 @@ jobs:
           # command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
           command: | #
             docker push $DOCKER_USER/circleci_m4:latest
-              if [ ! -z "$CIRCLE_TAG" ]; then
-                docker push $DOCKER_USER/circleci_m4:$CIRCLE_TAG
-              fi
 
   # Publish job - lesson 4.6
   publish:
@@ -75,16 +68,16 @@ jobs:
           name: Docker Login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
       - docker/build:
-          image: heropahn/education-space
+          image: heropahn/circleci_m4
           tag: "latest"
       - docker/build:
-          image: heropahn/education-space
+          image: heropahn/circleci_m4
           tag: "${CIRCLE_TAG}"
       - docker/push:
-          image: heropahn/education-space
+          image: heropahn/circleci_m4
           tag: "latest"
       - docker/push:
-          image: heropahn/education-space
+          image: heropahn/circleci_m4
           tag: "${CIRCLE_TAG}"
 
   create-commit-on-release:
