@@ -155,13 +155,9 @@ workflows:
           filters:
             branches:
               only: main
-      - run:
-          name: Create commit on release
-          command: |
-            git checkout release
-            git merge main
-            git commit --allow-empty -m "Trigger release workflow"
-            git push origin release
+      - create-commit-on-release:
+          requires:
+            - test
           filters:
             branches:
               only: main
