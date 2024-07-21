@@ -95,6 +95,8 @@ jobs:
       - run:
           name: Create commit on release
           command: |
+            git config user.email "heropahn@icloud.com"
+            git config user.name "heropahn"
             git checkout release
             git merge --no-edit main
             git commit --allow-empty -m "Trigger release workflow"
