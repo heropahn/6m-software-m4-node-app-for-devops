@@ -77,7 +77,7 @@ jobs:
           tag: "latest"
   scan: # Use the Snyk orb to scan the Docker image for vulnerabilities
     docker:
-      - image: cimg/base:16.10 # Use a base image to run the Snyk scan
+      - image: cimg/base:stable # Use a base image to run the Snyk scan
     environment:
       IMAGE_NAME: heropahn/circleci_m4 # Set the image name
     steps:
@@ -167,12 +167,12 @@ workflows:
           filters:
             branches:
               only: main # Only run on the main branch
-      # - codescan:
-      #     requires:
-      #       - build
-      #     filters:
-      #       branches:
-      #         only: main
+      - codescan:
+          requires:
+            - build
+          filters:
+            branches:
+              only: main
 
   release_workflow: # Workflow for the release branch
     jobs:
