@@ -28,7 +28,7 @@ jobs:
   # Test job
   test:
     docker:
-      - image: cimg/node:stable # Use a Node image to run tests
+      - image: cimg/node:16.10 # Use a Node image to run tests
     steps:
       - checkout # Check out the code
       - node/install-packages:
@@ -85,9 +85,14 @@ jobs:
       - setup_remote_docker # Set up Docker
       - docker/check # Check the Docker image
       # - run: docker build -t $IMAGE_NAME . # Build the Docker image
-      - run: docker pull heropahn/circleci_m4 # Pull the Docker image
+      - run: 
+          name: Docker Login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
+      - docker/build:
+          image: heropahn/circleci_m4
+          tag: "latest"
       - snyk/scan:
-          docker-image-name: heropahn/circleci_m4 # Scan the Docker image for vulnerabilities
+          docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
           severity-threshold: high # Set the severity threshold
           fail-on-issues: false # Fail the job if there are vulnerabilities
   
