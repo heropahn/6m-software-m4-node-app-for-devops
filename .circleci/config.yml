@@ -81,20 +81,12 @@ jobs:
     environment:
       IMAGE_NAME: heropahn/circleci_m4 # Set the image name
     steps:
-      - checkout # Check out the code
-      - setup_remote_docker # Set up Docker
-      - docker/check # Check the Docker image
-      # - run: docker build -t $IMAGE_NAME . # Build the Docker image
-      - run: 
-          name: Docker Login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
-      - docker/build:
-          image: heropahn/circleci_m4
-          tag: "latest"
-      - snyk/scan:
-          docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
-          severity-threshold: high # Set the severity threshold
-          fail-on-issues: false # Fail the job if there are vulnerabilities
+        - checkout
+        - setup_remote_docker      
+        - docker/check
+        - run: docker build -t $IMAGE_NAME .
+        - snyk/scan: 
+            docker-image-name: $IMAGE_NAME
   
   codescan:
     docker:
@@ -165,12 +157,12 @@ workflows:
           filters:
             branches:
               only: main # Only run on the main branch
-      # - scan: # Scan the Docker image for vulnerabilities
-      #     requires:
-      #       - build # Scan the Docker image for vulnerabilities
-      #     filters:
-      #       branches:
-      #         only: main # Only run on the main branch
+      - scan: # Scan the Docker image for vulnerabilities
+          requires:
+            - build # Scan the Docker image for vulnerabilities
+          filters:
+            branches:
+              only: main # Only run on the main branch
       # - codescan:
       #     requires:
       #       - build
