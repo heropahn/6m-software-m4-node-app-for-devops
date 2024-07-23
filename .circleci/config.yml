@@ -83,7 +83,7 @@ jobs:
     steps:
         - checkout
         - setup_remote_docker      
-        - docker/check
+        # - docker/check
         - run: 
             name: Docker Login and Build
             command: |
@@ -100,7 +100,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - docker/check
+      # - docker/check
       - run: docker build -t $IMAGE_NAME .
       - snyk/install
       - run: |
