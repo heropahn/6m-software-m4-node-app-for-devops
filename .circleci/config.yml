@@ -84,7 +84,7 @@ jobs:
       - checkout # Check out the code
       - setup_remote_docker # Set up Docker
       - docker/check # Check the Docker image
-      - run: docker built -t $IMAGE_NAME . # Build the Docker image
+      - run: docker build -t $IMAGE_NAME . # Build the Docker image
       - snyk/scan:
           docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
 
