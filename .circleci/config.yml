@@ -8,6 +8,8 @@ orbs:
   docker: circleci/docker@2.1.4
   # Heroku orb
   heroku: circleci/heroku@2.0.0
+  # Snyk orb
+  snyk: snyk/snyk@1.5.0
 
 # Jobs
 jobs:
@@ -73,6 +75,19 @@ jobs:
       - docker/push:
           image: heropahn/circleci_m4
           tag: "latest"
+    scan: # Use the Snyk orb to scan the Docker image for vulnerabilities
+      docker:
+        - image: cimg/base:16.10 # Use a base image to run the Snyk scan
+      environment:
+        IMAGE_NAME: heropahn/circleci_m4 # Set the image name
+      steps:
+        - checkout # Check out the code
+        - setup_remote_docker # Set up Docker
+        - docker/check # Check the Docker image
+        - run: docker built -t $IMAGE_NAME . # Build the Docker image
+        - snyk/scan:
+            docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
+
 
   deploy:
     docker:
@@ -128,6 +143,13 @@ workflows:
           filters:
             branches:
               only: main # Only run on the main branch
+      - scan: # Scan the Docker image for vulnerabilities
+          requires:
+            - build
+          filters:
+            branches:
+              only: main
+
   release_workflow: # Workflow for the release branch
     jobs:
       - build-and-push:
