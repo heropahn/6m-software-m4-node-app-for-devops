@@ -87,8 +87,6 @@ jobs:
       # - run: docker build -t $IMAGE_NAME . # Build the Docker image
       - run: docker pull $IMAGE_NAME # Pull the Docker image
       - snyk/scan:
-          # docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
-      - snyk/scan:
           docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
 
 
