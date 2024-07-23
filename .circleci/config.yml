@@ -68,7 +68,8 @@ jobs:
       #- docker/check
       - run:
           name: Docker Login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
+          # command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
+          command: echo "${PARAM_DOCKER_PASSWORD}" | docker login -u "${PARAM_DOCKER_USERNAME}" --password-stdin "$PARAM_REGISTRY" # Login to Docker Hub
       - docker/build:
           image: heropahn/circleci_m4
           tag: "latest"
