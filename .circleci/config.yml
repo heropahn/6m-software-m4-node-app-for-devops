@@ -55,9 +55,7 @@ jobs:
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
       - run:
           name: Push Docker Image
-          # command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
-          command: | #
-            docker push $DOCKER_USER/circleci_m4:latest
+          command: docker push $DOCKER_USER/circleci_m4:latest # Push the Docker image to Docker Hub
 
   # Publish job - lesson 4.6
   publish:
@@ -65,7 +63,6 @@ jobs:
     steps:
       - setup_remote_docker # Set up Docker
       - checkout # Check out the code
-      #- docker/check
       - run:
           name: Docker Login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
@@ -75,6 +72,7 @@ jobs:
       - docker/push:
           image: heropahn/circleci_m4
           tag: "latest"
+
   scan: # Use the Snyk orb to scan the Docker image for vulnerabilities
     docker:
       - image: cimg/base:stable # Use a base image to run the Snyk scan
@@ -84,7 +82,6 @@ jobs:
       - checkout # Check out the code
       - setup_remote_docker # Set up Docker
       - docker/check # Check the Docker image
-      # - run: docker build -t $IMAGE_NAME . # Build the Docker image
       - run: 
           name: Docker Login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin # Login to Docker Hub
@@ -110,7 +107,6 @@ jobs:
       - run: |
           snyk code test
 
-
   deploy:
     docker:
       - image: cimg/node:16.10
@@ -120,37 +116,12 @@ jobs:
       - checkout # Check out the code
       - run:
           name: Heroku Container Push
-          #  Set the stack to container, push the Docker image to Heroku, and release the image
-          # push web means the process type build the image then push to registry
-          # -a means the app name
-          # the following are heroku commands
           command: |
             heroku container:login
             heroku stack:set container -a george-su-devops 
             heroku container:push web -a george-su-devops
             heroku container:release web -a george-su-devops
 
-# Workflows
-# workflows:
-  # version: 2
-  # simple_workflow_coach: # Define the workflow
-  #   jobs: # Define the jobs that will run in the workflow
-  #     - build
-  #     - test: # Run tests
-  #         requires:
-  #           - build
-  #     - build-and-push: # Build and push the Docker image
-  #         requires:
-  #           - test
-  #     # Publish and deploy jobs - Assignment 4.6
-  #     - publish:
-  #         requires:
-  #           - test
-  #     - deploy:
-  #         requires:
-  #           - publish
-
-# Workflows
 workflows:
   version: 2
   main_workflow: # Workflow for the main branch
