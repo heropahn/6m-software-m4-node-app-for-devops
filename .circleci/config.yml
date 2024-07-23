@@ -85,12 +85,11 @@ jobs:
       - setup_remote_docker # Set up Docker
       - docker/check # Check the Docker image
       # - run: docker build -t $IMAGE_NAME . # Build the Docker image
-      - docker/build:
-          image: heropahn/circleci_m4
-          tag: "latest"
+      - run: docker pull $IMAGE_NAME # Pull the Docker image
       - snyk/scan:
           # docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
-          image: heropahn/circleci_m4
+      - snyk/scan:
+          docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
 
 
   deploy:
