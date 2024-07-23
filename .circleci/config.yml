@@ -90,9 +90,7 @@ jobs:
           tag: "latest"
       - snyk/scan:
           # docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
-        - docker:
-            image: heropahn/circleci_m4
-            tag: "latest"
+          image: heropahn/circleci_m4
 
 
   deploy:
