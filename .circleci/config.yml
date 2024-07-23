@@ -88,6 +88,22 @@ jobs:
       - run: docker pull $IMAGE_NAME # Pull the Docker image
       - snyk/scan:
           docker-image-name: $IMAGE_NAME # Scan the Docker image for vulnerabilities
+          severity-threshold: high # Set the severity threshold
+          fail-on-issues: false # Fail the job if there are vulnerabilities
+  
+  codescan:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      IMAGE_NAME: heropahn/circleci_m4
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/install
+      - run: |
+          snyk code test
 
 
   deploy:
@@ -150,6 +166,12 @@ workflows:
           filters:
             branches:
               only: main # Only run on the main branch
+      - codescan:
+          requires:
+            - build
+          filters:
+            branches:
+              only: main
 
   release_workflow: # Workflow for the release branch
     jobs:
